@@ -2,76 +2,72 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
+	"path/filepath"
 )
 
-const configFileName = "/.gatorconfig.json"
+const configFileName = ".gatorconfig.json"
 
 type Config struct {
-	Db_url    string `json:"db_url"`
-	User_name string `json:"user_name"`
+	DBurl           string `json:"db_url"`
+	CurrentUserName string `json:"user_name"`
+}
+
+func (cfg *Config) SetUser(userName string) error {
+	cfg.CurrentUserName = userName
+	return write(*cfg)
 }
 
 func Read() (Config, error) {
 	var config Config
 
-	path, err := getConfigFilePath()
+	fullPath, err := getConfigFilePath()
 	if err != nil {
-		return config, fmt.Errorf("failed to get config file path: %w", err)
+		return config, err
 	}
 
-	file, err := os.Open(path)
+	file, err := os.Open(fullPath)
 	if err != nil {
-		return config, fmt.Errorf("cannot open the file: %w", err)
+		return config, err
 	}
 	defer file.Close()
 
 	decoder := json.NewDecoder(file)
 	if err := decoder.Decode(&config); err != nil {
-		return config, fmt.Errorf("failed to decode config: %w", err)
+		return config, err
 	}
 
 	return config, nil
 }
 
-func getConfigFilePath() (string, error) {
-	path, err := os.UserHomeDir()
-	if err != nil {
-		return "", fmt.Errorf("home directory not found: %w", err)
-	}
-
-	filePath := path + configFileName
-
-	return filePath, nil
-}
-
 func write(cfg Config) error {
-	filePath, err := getConfigFilePath()
+	fullPath, err := getConfigFilePath()
 	if err != nil {
-		return fmt.Errorf("failed to get the config file path: %w", err)
+		return err
 	}
 
-	data, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	file, err := os.Create(fullPath)
 	if err != nil {
-		return fmt.Errorf("file couldn't found: %w", err)
+		return err
 	}
 
-	encoder := json.NewEncoder(data)
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
 	if err = encoder.Encode(&cfg); err != nil {
-		return fmt.Errorf("cannot encode the file")
+		return err
 	}
 
 	return nil
 }
 
-func (cfg *Config) SetUser(userName string) error {
-	cfg.User_name = userName
-
-	if err := write(*cfg); err != nil {
-		return fmt.Errorf("failed to update user in config: %w", err)
+func getConfigFilePath() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
 	}
 
-	fmt.Println("User updated successfully")
-	return nil
+	fullPath := filepath.Join(home, configFileName)
+
+	return fullPath, nil
 }
