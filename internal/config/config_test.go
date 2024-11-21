@@ -10,7 +10,7 @@ func TestSetUser(t *testing.T) {
 		t.Fatalf("SetUser failed: %v", err)
 	}
 
-	if cfg.User_name != "test_user" {
-		t.Errorf("expected username to be 'test_user', got %s", cfg.User_name)
+	if cfg.CurrentUserName != "test_user" {
+		t.Errorf("expected username to be 'test_user', got %s", cfg.CurrentUserName)
 	}
 }
