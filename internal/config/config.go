@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-const configFileName = ".gatorconfig.json"
+const configFileName = "/.gatorconfig.json"
 
 type Config struct {
 	Db_url    string `json:"db_url"`
@@ -21,9 +21,7 @@ func Read() (Config, error) {
 		return config, fmt.Errorf("failed to get config file path: %w", err)
 	}
 
-	filePath := path + configFileName
-
-	file, err := os.Open(filePath)
+	file, err := os.Open(path)
 	if err != nil {
 		return config, fmt.Errorf("cannot open the file: %w", err)
 	}
@@ -38,17 +36,42 @@ func Read() (Config, error) {
 }
 
 func getConfigFilePath() (string, error) {
-	home, err := os.UserHomeDir()
+	path, err := os.UserHomeDir()
 	if err != nil {
-		fmt.Println("Error: ", err)
+		return "", fmt.Errorf("home directory not found: %w", err)
 	}
-	return home, nil
+
+	filePath := path + configFileName
+
+	return filePath, nil
 }
 
 func write(cfg Config) error {
+	filePath, err := getConfigFilePath()
+	if err != nil {
+		return fmt.Errorf("failed to get the config file path: %w", err)
+	}
+
+	data, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	if err != nil {
+		return fmt.Errorf("file couldn't found: %w", err)
+	}
+
+	encoder := json.NewEncoder(data)
+	if err = encoder.Encode(&cfg); err != nil {
+		return fmt.Errorf("cannot encode the file")
+	}
+
 	return nil
 }
 
-func (cfg *Config) SetUser() {
+func (cfg *Config) SetUser(userName string) error {
+	cfg.User_name = userName
 
+	if err := write(*cfg); err != nil {
+		return fmt.Errorf("failed to update user in config: %w", err)
+	}
+
+	fmt.Println("User updated successfully")
+	return nil
 }
