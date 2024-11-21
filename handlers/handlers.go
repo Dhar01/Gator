@@ -12,7 +12,7 @@ var (
 	errNoArgument     = errors.New("no argument provided")
 )
 
-type state struct {
+type State struct {
 	config *config.Config
 }
 
@@ -22,10 +22,10 @@ type command struct {
 }
 
 type commands struct {
-	handlers map[string]func(*state, command) error
+	handlers map[string]func(*State, command) error
 }
 
-func handlerLogin(s *state, cmd command) error {
+func handlerLogin(s *State, cmd command) error {
 	if len(cmd.Argument) > 1 {
 		return errNoArgument
 	}
@@ -40,11 +40,11 @@ func handlerLogin(s *state, cmd command) error {
 	return nil
 }
 
-func (c *commands) register(name string, handler func(*state, command) error) {
+func (c *commands) register(name string, handler func(*State, command) error) {
 	c.handlers[name] = handler
 }
 
-func (c *commands) run(s *state, cmd command) error {
+func (c *commands) run(s *State, cmd command) error {
 	handler, ok := c.handlers[cmd.Name]
 	if !ok {
 		return errNoCommandFound
