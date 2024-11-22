@@ -9,43 +9,43 @@ import (
 
 var (
 	errNoCommandFound = errors.New("command not found")
-	errNoArgument     = errors.New("no argument provided")
+	errNoUsername     = errors.New("username is required!")
 )
 
 type State struct {
-	config *config.Config
+	Config *config.Config
 }
 
-type command struct {
+type Command struct {
 	Name     string
 	Argument []string
 }
 
-type commands struct {
-	handlers map[string]func(*State, command) error
+type Commands struct {
+	Handlers map[string]func(*State, Command) error
 }
 
-func handlerLogin(s *State, cmd command) error {
-	if len(cmd.Argument) > 1 {
-		return errNoArgument
+func HandlerLogin(s *State, cmd Command) error {
+	if len(cmd.Argument) < 1 {
+		return errNoUsername
 	}
 
 	username := cmd.Argument[0]
-	err := s.config.SetUser(username)
+	err := s.Config.SetUser(username)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("the user has been set")
+	fmt.Printf("the user '%s' has been set\n", username)
 	return nil
 }
 
-func (c *commands) register(name string, handler func(*State, command) error) {
-	c.handlers[name] = handler
+func (c *Commands) Register(name string, handler func(*State, Command) error) {
+	c.Handlers[name] = handler
 }
 
-func (c *commands) run(s *State, cmd command) error {
-	handler, ok := c.handlers[cmd.Name]
+func (c *Commands) Run(s *State, cmd Command) error {
+	handler, ok := c.Handlers[cmd.Name]
 	if !ok {
 		return errNoCommandFound
 	}
