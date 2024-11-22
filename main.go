@@ -1,32 +1,45 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"log"
+	"os"
 
-	// "github.com/Dhar01/Gator/handlers"
+	"github.com/Dhar01/Gator/handlers"
 	"github.com/Dhar01/Gator/internal/config"
 )
+
+var errLessArg = errors.New("not enough arguments provided")
 
 func main() {
 	cfg, err := config.Read()
 	if err != nil {
-		log.Fatalf("error reading config: %v", err)
+		fmt.Println(err)
 	}
 
-	// st := handlers.State{
-	// 	&config.Config{
-	// 		CurrentUserName: "loki",
-	// 	}
-	// }
+	state := handlers.State{
+		Config: &cfg,
+	}
 
-	fmt.Println("Initial config:", cfg)
+	cmd := handlers.Commands{
+		Handlers: make(map[string]func(*handlers.State, handlers.Command) error),
+	}
 
-	err = cfg.SetUser("jane")
+	cmd.Register("login", handlers.HandlerLogin)
 
-	updatedCfg, err := config.Read()
+	if len(os.Args) < 2 {
+		fmt.Println(errLessArg)
+		os.Exit(1)
+	}
+
+	command := handlers.Command{
+		Name:     os.Args[1],
+		Argument: os.Args[2:],
+	}
+
+	err = cmd.Run(&state, command)
 	if err != nil {
-		log.Fatalf("error reading config: %v", err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
-	fmt.Println("Updated config: ", updatedCfg)
 }
