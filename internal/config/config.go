@@ -54,7 +54,7 @@ func write(cfg Config) error {
 	defer file.Close()
 
 	encoder := json.NewEncoder(file)
-	if err = encoder.Encode(&cfg); err != nil {
+	if err = encoder.Encode(cfg); err != nil {
 		return err
 	}
 
