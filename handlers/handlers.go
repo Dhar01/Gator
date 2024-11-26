@@ -10,14 +10,15 @@ import (
 var errNoUsername = errors.New("username is required!")
 
 func HandlerLogin(s *cmd.State, cmd cmd.Command) error {
-	if len(cmd.Argument) < 1 {
+	if len(cmd.Args) < 1 {
+		fmt.Printf("usage: %s <name>\n", cmd.Name)
 		return errNoUsername
 	}
 
-	username := cmd.Argument[0]
-	err := s.Config.SetUser(username)
-	if err != nil {
-		return err
+	username := cmd.Args[0]
+
+	if err := s.Config.SetUser(username); err != nil {
+		return fmt.Errorf("couldn't set current user: %w", err)
 	}
 
 	fmt.Printf("the user '%s' has been set\n", username)

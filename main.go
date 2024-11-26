@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Dhar01/Gator/commands"
 	"github.com/Dhar01/Gator/handlers"
 	"github.com/Dhar01/Gator/internal/config"
 )
@@ -17,12 +18,12 @@ func main() {
 		fmt.Println(err)
 	}
 
-	state := handlers.State{
+	state := commands.State{
 		Config: &cfg,
 	}
 
-	cmd := handlers.Commands{
-		Handlers: make(map[string]func(*handlers.State, handlers.Command) error),
+	cmd := commands.Commands{
+		Handlers: make(map[string]func(*commands.State, commands.Command) error),
 	}
 
 	cmd.Register("login", handlers.HandlerLogin)
@@ -32,9 +33,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	command := handlers.Command{
+	command := commands.Command{
 		Name:     os.Args[1],
-		Argument: os.Args[2:],
+		Args: os.Args[2:],
 	}
 
 	err = cmd.Run(&state, command)

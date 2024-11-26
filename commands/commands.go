@@ -13,8 +13,8 @@ type State struct {
 }
 
 type Command struct {
-	Name     string
-	Argument []string
+	Name string
+	Args []string
 }
 
 type Commands struct {
