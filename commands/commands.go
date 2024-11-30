@@ -4,11 +4,13 @@ import (
 	"errors"
 
 	"github.com/Dhar01/Gator/internal/config"
+	"github.com/Dhar01/Gator/internal/database"
 )
 
 var errNoCommandFound = errors.New("command not found")
 
 type State struct {
+	DB     *database.Queries
 	Config *config.Config
 }
 
