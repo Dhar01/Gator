@@ -34,7 +34,7 @@ func main() {
 	}
 
 	command := commands.Command{
-		Name:     os.Args[1],
+		Name: os.Args[1],
 		Args: os.Args[2:],
 	}
 
