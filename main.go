@@ -42,6 +42,7 @@ func main() {
 
 	cmd.Register("login", handlers.HandlerLogin)
 	cmd.Register("register", handlers.HandlerRegister)
+	cmd.Register("reset", handlers.HandlerReset)
 
 	if len(os.Args) < 2 {
 		fmt.Println(errLessArg)
