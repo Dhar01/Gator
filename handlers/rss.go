@@ -29,26 +29,13 @@ type RSSItem struct {
 }
 
 func HandlerAggregate(s *commands.State, cmd commands.Command) error {
-	result, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
+	feed, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
 	if err != nil {
 		log.Printf("fetch ERROR: %v", err)
 		return err
 	}
 
-	// title := html.UnescapeString(result.Channel.Title)
-	// description := html.UnescapeString(result.Channel.Description)
-
-	// fmt.Println(title)
-	// fmt.Println(description)
-
-	for _, item := range result.Channel.Item {
-		title := html.UnescapeString(item.Title)
-		description := html.UnescapeString(item.Description)
-		if title == "The Zen of Proverbs" || title == "Optimize for simplicity" {
-			fmt.Println(title)
-			fmt.Println("Result: ", description)
-		}
-	}
+	fmt.Printf("%+v\n", *feed)
 
 	return nil
 }
@@ -82,6 +69,14 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 	if err := xml.Unmarshal(body, &feed); err != nil {
 		log.Printf("Unmarshal Error: %v", err)
 		return &feed, err
+	}
+
+	feed.Channel.Title = html.UnescapeString(feed.Channel.Title)
+	feed.Channel.Description = html.UnescapeString(feed.Channel.Description)
+
+	for i, _ := range feed.Channel.Item {
+		feed.Channel.Item[i].Title = html.UnescapeString(feed.Channel.Item[i].Title)
+		feed.Channel.Item[i].Description = html.UnescapeString(feed.Channel.Item[i].Description)
 	}
 
 	return &feed, nil
