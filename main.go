@@ -19,14 +19,14 @@ var errLessArg = errors.New("not enough arguments provided")
 func main() {
 	cfg, err := config.Read()
 	if err != nil {
-		log.Fatalf("error reading config: %v", err)
+		log.Printf("error reading config: %v", err)
 	}
 
 	dbURL := "postgres://postgres:postgres@localhost:5432/gator"
 
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
-		log.Fatalf("ERROR: %v", err)
+		log.Printf("ERROR: %v", err)
 	}
 
 	dbQueries := database.New(db)
@@ -44,6 +44,7 @@ func main() {
 	cmd.Register("register", handlers.HandlerRegister)
 	cmd.Register("reset", handlers.HandlerReset)
 	cmd.Register("users", handlers.HandlerUsers)
+	cmd.Register("agg", handlers.HandlerAggregate)
 
 	if len(os.Args) < 2 {
 		fmt.Println(errLessArg)
@@ -57,7 +58,7 @@ func main() {
 
 	err = cmd.Run(state, command)
 	if err != nil {
-		log.Fatalf("ERROR: %v", err)
+		log.Printf("ERROR: %v", err)
 		os.Exit(1)
 	}
 
