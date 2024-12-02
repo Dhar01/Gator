@@ -45,6 +45,7 @@ func main() {
 	cmd.Register("reset", handlers.HandlerReset)
 	cmd.Register("users", handlers.HandlerUsers)
 	cmd.Register("agg", handlers.HandlerAggregate)
+	cmd.Register("addfeed", handlers.HandlerAddFeed)
 
 	if len(os.Args) < 2 {
 		fmt.Println(errLessArg)
