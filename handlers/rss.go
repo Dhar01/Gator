@@ -46,7 +46,7 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 	req, err := http.NewRequestWithContext(ctx, "GET", feedURL, nil)
 	if err != nil {
 		log.Printf("ERROR: %v", err)
-		return &feed, err
+		return nil, err
 	}
 
 	req.Header.Add("User-Agent", "gator")
@@ -55,7 +55,7 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Printf("Error: %v", err)
-		return &feed, err
+		return nil, err
 	}
 
 	defer resp.Body.Close()
@@ -63,18 +63,18 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Resp Body Error: %v", err)
-		return &feed, err
+		return nil, err
 	}
 
 	if err := xml.Unmarshal(body, &feed); err != nil {
 		log.Printf("Unmarshal Error: %v", err)
-		return &feed, err
+		return nil, err
 	}
 
 	feed.Channel.Title = html.UnescapeString(feed.Channel.Title)
 	feed.Channel.Description = html.UnescapeString(feed.Channel.Description)
 
-	for i, _ := range feed.Channel.Item {
+	for i := range feed.Channel.Item {
 		feed.Channel.Item[i].Title = html.UnescapeString(feed.Channel.Item[i].Title)
 		feed.Channel.Item[i].Description = html.UnescapeString(feed.Channel.Item[i].Description)
 	}
