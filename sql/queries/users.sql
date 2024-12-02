@@ -17,7 +17,7 @@ SELECT * FROM users ORDER BY name;
 -- name: DeleteAllUsers :exec
 DELETE FROM users;
 
--- name: CreateFeed :many
+-- name: CreateFeed :one
 INSERT INTO feeds(id, created_at, updated_at, name, url, user_id)
 VALUES (
     $1,
@@ -28,4 +28,3 @@ VALUES (
     $6
 )
 RETURNING *;
-
