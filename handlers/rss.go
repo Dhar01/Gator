@@ -31,7 +31,7 @@ type RSSItem struct {
 func HandlerAggregate(s *commands.State, cmd commands.Command) error {
 	feed, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
 	if err != nil {
-		log.Printf("fetch ERROR: %v", err)
+		log.Printf("ERROR: can't get feed, %v\n", err)
 		return err
 	}
 
@@ -45,7 +45,7 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 
 	req, err := http.NewRequestWithContext(ctx, "GET", feedURL, nil)
 	if err != nil {
-		log.Printf("ERROR: %v", err)
+		log.Printf("ERROR: %v\n", err)
 		return nil, err
 	}
 
@@ -54,7 +54,7 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 	client := http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Printf("Error: %v", err)
+		log.Printf("ERROR: %v\n", err)
 		return nil, err
 	}
 
@@ -62,12 +62,12 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Resp Body Error: %v", err)
+		log.Printf("ERROR: response body error, %v\n", err)
 		return nil, err
 	}
 
 	if err := xml.Unmarshal(body, &feed); err != nil {
-		log.Printf("Unmarshal Error: %v", err)
+		log.Printf("ERROR: unmarshal failed, %v\n", err)
 		return nil, err
 	}
 

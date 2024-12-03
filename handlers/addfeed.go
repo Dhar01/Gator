@@ -21,7 +21,7 @@ func HandlerAddFeed(s *commands.State, cmd commands.Command) error {
 	username := s.Config.CurrentUserName
 	user, err := s.DB.GetUser(context.Background(), username)
 	if err != nil {
-		return fmt.Errorf("couldn't find user!")
+		return fmt.Errorf("ERROR: couldn't find user!\n")
 	}
 
 	name := cmd.Args[0]
@@ -38,10 +38,10 @@ func HandlerAddFeed(s *commands.State, cmd commands.Command) error {
 
 	feed, err := s.DB.CreateFeed(context.Background(), data)
 	if err != nil {
-		return fmt.Errorf("Error: %v", err)
+		return fmt.Errorf("ERROR: %v\n", err)
 	}
 
-	fmt.Printf("%+v", feed)
+	fmt.Printf("%+v\n", feed)
 
 	return nil
 }

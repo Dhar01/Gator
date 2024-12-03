@@ -10,7 +10,7 @@ import (
 func HandlerUsers(s *commands.State, cmd commands.Command) error {
 	users, err := s.DB.ListUsers(context.Background())
 	if err != nil {
-		return fmt.Errorf("couldn't find users: %v", err)
+		return fmt.Errorf("ERROR: couldn't find users: %v\n", err)
 	}
 
 	for _, user := range users {
