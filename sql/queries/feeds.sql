@@ -9,3 +9,16 @@ VALUES (
     $6
 )
 RETURNING *;
+
+-- name: GetAllFeeds :many
+SELECT * FROM feeds
+JOIN users ON feeds.user_id = users.id;
+
+-- name: FetchFeeds :many
+SELECT * FROM feeds
+JOIN users ON feeds.user_id = users.id
+WHERE feeds.user_id = $1
+ORDER BY feeds.created_at;
+
+-- name: DeleteAllFeeds :exec
+DELETE FROM feeds;
