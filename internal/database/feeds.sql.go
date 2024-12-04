@@ -109,6 +109,22 @@ func (q *Queries) DeleteAllFeeds(ctx context.Context) error {
 	return err
 }
 
+const feedUnfollow = `-- name: FeedUnfollow :exec
+DELETE FROM feed_follows
+WHERE feed_follows.user_id = $1
+AND feed_follows.feed_id = (SELECT feed_id FROM feeds WHERE url = $2)
+`
+
+type FeedUnfollowParams struct {
+	UserID uuid.UUID
+	Url    string
+}
+
+func (q *Queries) FeedUnfollow(ctx context.Context, arg FeedUnfollowParams) error {
+	_, err := q.db.ExecContext(ctx, feedUnfollow, arg.UserID, arg.Url)
+	return err
+}
+
 const fetchFeeds = `-- name: FetchFeeds :many
 SELECT feeds.id, feeds.created_at, feeds.updated_at, feeds.name, url, user_id, users.id, users.created_at, users.updated_at, users.name FROM feeds
 JOIN users ON feeds.user_id = users.id
