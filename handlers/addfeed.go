@@ -36,10 +36,22 @@ func HandlerAddFeed(s *commands.State, cmd commands.Command) error {
 
 	feed, err := s.DB.CreateFeed(context.Background(), data)
 	if err != nil {
-		return fmt.Errorf("ERROR: %v\n", err)
+		return fmt.Errorf("can't create feed: %v\n", err)
 	}
 
-	fmt.Printf("%+v\n", feed)
+
+	followFeed, err := s.DB.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
+		UserID: user.ID,
+		FeedID: feed.ID,
+	})
+	if err != nil {
+		return fmt.Errorf("can't follow feed: %w", err)
+	}
+
+	fmt.Printf("Adding feed %s is done!\n", name)
+	fmt.Printf("%s is now following %s feed.\n", user.Name, name)
+
+	fmt.Println(followFeed)
 
 	return nil
 }
