@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -45,11 +46,11 @@ func main() {
 	cmd.Register("reset", handlers.HandlerReset)
 	cmd.Register("users", handlers.HandlerUsers)
 	cmd.Register("agg", handlers.HandlerAggregate)
-	cmd.Register("addfeed", handlers.HandlerAddFeed)
+	cmd.Register("addfeed", middlewareLoggedIn(handlers.HandlerAddFeed))
 	cmd.Register("feeds", handlers.HandlerFeeds)
 	cmd.Register("fetch", handlers.HandlerFetch)
-	cmd.Register("follow", handlers.HandlerFollow)
-	cmd.Register("following", handlers.HandlerFollowing)
+	cmd.Register("follow", middlewareLoggedIn(handlers.HandlerFollow))
+	cmd.Register("following", middlewareLoggedIn(handlers.HandlerFollowing))
 
 	if len(os.Args) < 2 {
 		fmt.Println(errLessArg)
@@ -67,4 +68,14 @@ func main() {
 		os.Exit(1)
 	}
 
+}
+
+func middlewareLoggedIn(handler func(s *commands.State, cmd commands.Command, user database.User) error) func(*commands.State, commands.Command) error {
+	return func(s *commands.State, cmd commands.Command) error {
+		user, err := s.DB.GetUser(context.Background(), s.Config.CurrentUserName)
+		if err != nil {
+			return fmt.Errorf("ERROR: couldn't find user!\n")
+		}
+		return handler(s, cmd, user)
+	}
 }

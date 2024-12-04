@@ -10,22 +10,18 @@ import (
 	"github.com/Dhar01/Gator/internal/database"
 )
 
-func HandlerFollow(s *commands.State, cmd commands.Command) error {
+func HandlerFollow(s *commands.State, cmd commands.Command, user database.User) error {
 	if len(cmd.Args) < 1 {
 		fmt.Printf("USAGE: %s <URL>\n", cmd.Name)
 		return fmt.Errorf("URL missing\n")
 	}
 
 	url := cmd.Args[0]
-	user, err := s.DB.GetUser(context.Background(), s.Config.CurrentUserName)
-	if err != nil {
-		return fmt.Errorf("can't get user!\n")
-	}
 
 	var feed database.Feed
 
 	// check if a feed exists
-	feed, err = s.DB.GetFeedByURL(context.Background(), url)
+	feed, err := s.DB.GetFeedByURL(context.Background(), url)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return fmt.Errorf("feed not found for URL: %s\n", err)
