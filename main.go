@@ -49,6 +49,7 @@ func main() {
 	cmd.Register("feeds", handlers.HandlerFeeds)
 	cmd.Register("fetch", handlers.HandlerFetch)
 	cmd.Register("follow", handlers.HandlerFollow)
+	cmd.Register("following", handlers.HandlerFollowing)
 
 	if len(os.Args) < 2 {
 		fmt.Println(errLessArg)
