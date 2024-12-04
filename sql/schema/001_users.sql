@@ -7,4 +7,4 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- +goose Down
-DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS users;

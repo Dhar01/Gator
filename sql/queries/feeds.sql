@@ -20,9 +20,9 @@ JOIN users ON feeds.user_id = users.id
 WHERE feeds.user_id = $1
 ORDER BY feeds.created_at;
 
--- name: CreateFeedFollow :many
+-- name: CreateFeedFollow :one
 WITH inserted_feed_follow AS (
-    INSERT INTO feed_follows (id, created_at, updated_at, user_id, feed_id)
+    INSERT INTO feed_follows(id, created_at, updated_at, user_id, feed_id)
     VALUES (gen_random_uuid(), NOW(), NOW(), $1, $2)
     RETURNING *
 )
