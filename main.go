@@ -51,6 +51,7 @@ func main() {
 	cmd.Register("fetch", handlers.HandlerFetch)
 	cmd.Register("follow", middlewareLoggedIn(handlers.HandlerFollow))
 	cmd.Register("following", middlewareLoggedIn(handlers.HandlerFollowing))
+	cmd.Register("unfollow", middlewareLoggedIn(handlers.HandlerUnfollow))
 
 	if len(os.Args) < 2 {
 		fmt.Println(errLessArg)
