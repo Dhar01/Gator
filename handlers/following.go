@@ -5,14 +5,10 @@ import (
 	"fmt"
 
 	"github.com/Dhar01/Gator/commands"
+	"github.com/Dhar01/Gator/internal/database"
 )
 
-func HandlerFollowing(s *commands.State, cmd commands.Command) error {
-	user, err := s.DB.GetUser(context.Background(), s.Config.CurrentUserName)
-	if err != nil {
-		return fmt.Errorf("User not found: %w", err)
-	}
-
+func HandlerFollowing(s *commands.State, cmd commands.Command, user database.User) error {
 	feeds, err := s.DB.GetFeedFollowsForUser(context.Background(), user.ID)
 	if err != nil {
 		return fmt.Errorf("can't get feeds for user %s, %v", user.Name, err)

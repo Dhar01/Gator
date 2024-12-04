@@ -10,16 +10,10 @@ import (
 	"github.com/google/uuid"
 )
 
-func HandlerAddFeed(s *commands.State, cmd commands.Command) error {
+func HandlerAddFeed(s *commands.State, cmd commands.Command, user database.User) error {
 	if len(cmd.Args) < 2 {
 		fmt.Printf("USAGE: addfeed <name> <feed_link>\n")
 		return fmt.Errorf("%s command, wrong structure\n", cmd.Name)
-	}
-
-	username := s.Config.CurrentUserName
-	user, err := s.DB.GetUser(context.Background(), username)
-	if err != nil {
-		return fmt.Errorf("ERROR: couldn't find user!\n")
 	}
 
 	name := cmd.Args[0]
@@ -38,7 +32,6 @@ func HandlerAddFeed(s *commands.State, cmd commands.Command) error {
 	if err != nil {
 		return fmt.Errorf("can't create feed: %v\n", err)
 	}
-
 
 	followFeed, err := s.DB.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
 		UserID: user.ID,
