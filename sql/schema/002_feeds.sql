@@ -10,4 +10,4 @@ CREATE TABLE IF NOT EXISTS feeds (
 );
 
 -- +goose Down
-DROP TABLE IF EXISTS feeds;
+DROP TABLE IF EXISTS feeds CASCADE;

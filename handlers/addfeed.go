@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
@@ -11,11 +10,10 @@ import (
 	"github.com/google/uuid"
 )
 
-var errUsage = errors.New("Usage: %s <name> <feed link>")
-
 func HandlerAddFeed(s *commands.State, cmd commands.Command) error {
-	if len(cmd.Args) < 2 || len(cmd.Args) < 1 {
-		return errUsage
+	if len(cmd.Args) < 2 {
+		fmt.Printf("USAGE: addfeed <name> <feed_link>\n")
+		return fmt.Errorf("%s command, wrong structure\n", cmd.Name)
 	}
 
 	username := s.Config.CurrentUserName
