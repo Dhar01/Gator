@@ -195,3 +195,46 @@ func (q *Queries) GetFeedByURL(ctx context.Context, url string) (Feed, error) {
 	)
 	return i, err
 }
+
+const getNextFeedToFetch = `-- name: GetNextFeedToFetch :one
+SELECT id, url
+FROM feeds
+ORDER BY last_fetched_at ASC NULLS FIRST
+LIMIT 1
+`
+
+type GetNextFeedToFetchRow struct {
+	ID  uuid.UUID
+	Url string
+}
+
+func (q *Queries) GetNextFeedToFetch(ctx context.Context) (GetNextFeedToFetchRow, error) {
+	row := q.db.QueryRowContext(ctx, getNextFeedToFetch)
+	var i GetNextFeedToFetchRow
+	err := row.Scan(&i.ID, &i.Url)
+	return i, err
+}
+
+const markFeedFetched = `-- name: MarkFeedFetched :one
+UPDATE feeds
+SET
+    last_fetched_at = CURRENT_TIMESTAMP,
+    updated_at = CURRENT_TIMESTAMP
+WHERE id = $1
+RETURNING id, created_at, updated_at, last_fetched_at, name, url, user_id
+`
+
+func (q *Queries) MarkFeedFetched(ctx context.Context, id uuid.UUID) (Feed, error) {
+	row := q.db.QueryRowContext(ctx, markFeedFetched, id)
+	var i Feed
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.LastFetchedAt,
+		&i.Name,
+		&i.Url,
+		&i.UserID,
+	)
+	return i, err
+}

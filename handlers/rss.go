@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/Dhar01/Gator/commands"
 )
@@ -29,15 +30,30 @@ type RSSItem struct {
 }
 
 func HandlerAggregate(s *commands.State, cmd commands.Command) error {
-	feed, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
-	if err != nil {
-		log.Printf("ERROR: can't get feed, %v\n", err)
-		return err
+
+	// feed, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
+	// if err != nil {
+	// 	log.Printf("ERROR: can't get feed, %v\n", err)
+	// 	return err
+	// }
+	// fmt.Printf("%+v\n", *feed)
+
+	if len(cmd.Args) < 1 || len(cmd.Args) > 2 {
+		return fmt.Errorf("USAGE: %v <time_between_reqs>", cmd.Name)
 	}
 
-	fmt.Printf("%+v\n", *feed)
+	timeBetweenReq, err := time.ParseDuration(cmd.Args[0])
+	if err != nil {
+		return fmt.Errorf("invalid duration: %w", err)
+	}
 
-	return nil
+	log.Printf("Collecting feeds every %s...", timeBetweenReq)
+
+	ticker := time.NewTicker(timeBetweenReq)
+
+	for ; ; <-ticker.C {
+		scrapeFeeds(s)
+	}
 }
 
 func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
@@ -80,4 +96,26 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 	}
 
 	return &feed, nil
+}
+
+func scrapeFeeds(s *commands.State) error {
+	nextFeed, err := s.DB.GetNextFeedToFetch(context.Background())
+	if err != nil {
+		return fmt.Errorf("couldn't get the next feed, %w", err)
+	}
+
+	if _, err = s.DB.MarkFeedFetched(context.Background(), nextFeed.ID); err != nil {
+		return fmt.Errorf("can't mark as fetched")
+	}
+
+	feedData, err := fetchFeed(context.Background(), nextFeed.Url)
+	if err != nil {
+		return fmt.Errorf("couldn't fetch the feed")
+	}
+
+	for _, item := range feedData.Channel.Item {
+		fmt.Printf("- %s\n", item.Title)
+	}
+
+	return nil
 }
