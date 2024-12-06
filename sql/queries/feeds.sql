@@ -24,5 +24,19 @@ ORDER BY feeds.created_at;
 SELECT * FROM feeds
 WHERE url = $1;
 
+-- name: MarkFeedFetched :one
+UPDATE feeds
+SET
+    last_fetched_at = CURRENT_TIMESTAMP,
+    updated_at = CURRENT_TIMESTAMP
+WHERE id = $1
+RETURNING *;
+
+-- name: GetNextFeedToFetch :one
+SELECT id, url
+FROM feeds
+ORDER BY last_fetched_at ASC NULLS FIRST
+LIMIT 1;
+
 -- name: DeleteAllFeeds :exec
 DELETE FROM feeds;
