@@ -23,5 +23,7 @@ func HandlerUnfollow(s *commands.State, cmd commands.Command, user database.User
 		return fmt.Errorf("can't unfollow feed: %w\n", err)
 	}
 
+	fmt.Printf("Successfully unfollowed %s\n", url)
+
 	return nil
 }
