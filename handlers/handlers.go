@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/Dhar01/Gator/commands"
-	"github.com/Dhar01/Gator/internal/database"
 )
 
 var (
@@ -23,9 +22,4 @@ func HandlerReset(s *commands.State, cmd commands.Command) error {
 	fmt.Println("Database reset successfully!")
 
 	return nil
-}
-
-func printUser(user database.User) {
-	fmt.Printf(" * ID:   %v\n", user.ID)
-	fmt.Printf(" * Name: %v\n", user.Name)
 }

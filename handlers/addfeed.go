@@ -36,7 +36,7 @@ func HandlerAddFeed(s *commands.State, cmd commands.Command, user database.User)
 		UserID: user.ID,
 		FeedID: feed.ID,
 	}); err != nil {
-		return fmt.Errorf("couldn't follow feed: %w", err)
+		return fmt.Errorf("couldn't follow feed: %w\n", err)
 	}
 
 	fmt.Printf("%s is now following %s feed.\n", user.Name, name)
