@@ -15,7 +15,7 @@ SELECT * FROM users WHERE name = $1;
 SELECT * FROM users WHERE id = $1;
 
 -- name: ListUsers :many
-SELECT * FROM users ORDER BY name;
+SELECT * FROM users;
 
 -- name: DeleteAllUsers :exec
 DELETE FROM users;

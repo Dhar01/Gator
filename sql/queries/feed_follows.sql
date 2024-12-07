@@ -19,11 +19,11 @@ WHERE feed_follows.user_id = $1
 AND feed_follows.feed_id = (SELECT feed_id FROM feeds WHERE url = $2);
 
 -- name: GetFeedFollowsForUser :many
-SELECT feeds.name, feeds.url, users.name
+SELECT feeds.name, users.name
 FROM feed_follows
-JOIN feeds ON feed_follows.feed_id = feeds.id
-JOIN users ON feed_follows.user_id = users.id
-WHERE users.id = $1;
+INNER JOIN feeds ON feed_follows.feed_id = feeds.id
+INNER JOIN users ON feed_follows.user_id = users.id
+WHERE feed_follows.user_id = $1;
 
 -- name: DeleteFeedFollows :exec
 DROP TABLE feed_follows;
