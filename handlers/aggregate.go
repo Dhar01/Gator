@@ -2,12 +2,15 @@ package handlers
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/Dhar01/Gator/commands"
 	"github.com/Dhar01/Gator/internal/database"
+	"github.com/google/uuid"
 )
 
 func HandlerAggregate(s *commands.State, cmd commands.Command) error {
@@ -24,9 +27,11 @@ func HandlerAggregate(s *commands.State, cmd commands.Command) error {
 
 	ticker := time.NewTicker(timeBetweenReq)
 
-	for ; ; <-ticker.C {
+	for range ticker.C {
 		scrapeFeeds(s)
 	}
+
+	return nil
 }
 
 func scrapeFeeds(s *commands.State) {
@@ -52,15 +57,35 @@ func scrapeFeed(db *database.Queries, feed database.Feed) {
 		return
 	}
 
-	// for _, item := range feedData.Channel.Item {
-	// 	publishedAt := sql.NullTime{}
-	// 	if t, err := time.Parse()
-	// 	_, err = db.CreatePost(context.Background(), database.CreatePostParams{
-	// 		Url:         item.Link,
-	// 		Description: item.Description,
-	// 		Title:       item.Title,
-	// 		PublishedAt: item.PubDate,
-	// 	})
-	// }
+	for _, item := range feedData.Channel.Item {
+		publishedAt := sql.NullTime{}
 
+		if t, err := time.Parse(time.RFC1123Z, item.PubDate); err == nil {
+			publishedAt = sql.NullTime{
+				Time:  t,
+				Valid: true,
+			}
+		}
+
+		_, err := db.CreatePost(context.Background(), database.CreatePostParams{
+			ID:          uuid.New(),
+			Title:       item.Title,
+			Url:         item.Link,
+			PublishedAt: publishedAt,
+			Description: sql.NullString{
+				String: item.Description,
+				Valid:  true,
+			},
+			FeedID: feed.ID,
+		})
+		if err != nil {
+			if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+				continue
+			}
+			log.Printf("Couldn't create post: %v", err)
+			continue
+		}
+	}
+
+	log.Printf("Feed %s collected, %v posts found\n", feed.Name, len(feedData.Channel.Item))
 }

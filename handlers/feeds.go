@@ -18,11 +18,12 @@ func HandlerFeeds(s *commands.State, cmd commands.Command) error {
 		return nil
 	}
 
-	fmt.Printf("Found %d feeds:\n", len(feeds))
+	fmt.Printf("Found %d feeds:\n\n", len(feeds))
 
 	for _, feed := range feeds {
-		fmt.Printf("%s\n", feed.Name)
-		fmt.Printf("%s\n", feed.Url)
+		fmt.Printf("Name: %s\n", feed.Name)
+		fmt.Printf("URL: %s\n", feed.Url)
+		fmt.Println()
 	}
 
 	return nil

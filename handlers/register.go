@@ -36,3 +36,9 @@ func HandlerRegister(s *cmd.State, cmd cmd.Command) error {
 
 	return nil
 }
+
+
+func printUser(user database.User) {
+	fmt.Printf(" * ID:   %v\n", user.ID)
+	fmt.Printf(" * Name: %v\n", user.Name)
+}

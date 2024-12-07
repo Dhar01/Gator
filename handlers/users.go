@@ -16,8 +16,9 @@ func HandlerUsers(s *commands.State, cmd commands.Command) error {
 	for _, user := range users {
 		if user.Name == s.Config.CurrentUserName {
 			fmt.Printf("* %s (current)\n", user.Name)
+		} else {
+			fmt.Println("*", user.Name)
 		}
-		fmt.Println("*", user.Name)
 	}
 
 	return nil
