@@ -8,7 +8,6 @@ package database
 import (
 	"context"
 	"database/sql"
-	"time"
 
 	"github.com/google/uuid"
 )
@@ -31,7 +30,7 @@ type CreatePostParams struct {
 	Title       string
 	Url         string
 	Description sql.NullString
-	PublishedAt time.Time
+	PublishedAt sql.NullTime
 	FeedID      uuid.UUID
 }
 
@@ -71,18 +70,25 @@ const getPostsByUser = `-- name: GetPostsByUser :many
 SELECT posts.title, posts.url, posts.published_at
 FROM posts
 JOIN feed_follows ON posts.feed_id = feed_follows.feed_id
+JOIN feeds on posts.feed_id = feeds.id
 WHERE feed_follows.user_id = $1
-ORDER BY posts.updated_at DESC
+ORDER BY posts.published_at DESC
+LIMIT $2
 `
+
+type GetPostsByUserParams struct {
+	UserID uuid.UUID
+	Limit  int32
+}
 
 type GetPostsByUserRow struct {
 	Title       string
 	Url         string
-	PublishedAt time.Time
+	PublishedAt sql.NullTime
 }
 
-func (q *Queries) GetPostsByUser(ctx context.Context, userID uuid.UUID) ([]GetPostsByUserRow, error) {
-	rows, err := q.db.QueryContext(ctx, getPostsByUser, userID)
+func (q *Queries) GetPostsByUser(ctx context.Context, arg GetPostsByUserParams) ([]GetPostsByUserRow, error) {
+	rows, err := q.db.QueryContext(ctx, getPostsByUser, arg.UserID, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
