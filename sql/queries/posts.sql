@@ -10,8 +10,8 @@ VALUES (
 )
 RETURNING *;
 
--- name: GetPostsByUser :many
-SELECT posts.title, posts.url, posts.published_at
+-- name: GetPostsForUser :many
+SELECT posts.title, posts.url, posts.published_at, posts.description
 FROM posts
 JOIN feed_follows ON posts.feed_id = feed_follows.feed_id
 JOIN feeds on posts.feed_id = feeds.id
