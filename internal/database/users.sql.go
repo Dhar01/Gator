@@ -89,7 +89,7 @@ func (q *Queries) GetUserById(ctx context.Context, id uuid.UUID) (User, error) {
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, created_at, updated_at, name FROM users ORDER BY name
+SELECT id, created_at, updated_at, name FROM users
 `
 
 func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
