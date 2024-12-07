@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	cmd "github.com/Dhar01/Gator/commands"
-	db "github.com/Dhar01/Gator/internal/database"
+	"github.com/Dhar01/Gator/commands"
+	"github.com/Dhar01/Gator/internal/database"
 )
 
 var (
@@ -15,17 +15,17 @@ var (
 	errDuplicateUser = errors.New("duplicate username found")
 )
 
-func HandlerReset(s *cmd.State, cmd cmd.Command) error {
+func HandlerReset(s *commands.State, cmd commands.Command) error {
 	if err := s.DB.DeleteAllUsers(context.Background()); err != nil {
 		return fmt.Errorf("ERROR: Couldn't reset, %v\n", err)
 	}
 
-	fmt.Println("database reset successfully!")
+	fmt.Println("Database reset successfully!")
 
 	return nil
 }
 
-func printUser(user db.User) {
+func printUser(user database.User) {
 	fmt.Printf(" * ID:   %v\n", user.ID)
 	fmt.Printf(" * Name: %v\n", user.Name)
 }

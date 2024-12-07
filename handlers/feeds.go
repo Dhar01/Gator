@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/Dhar01/Gator/commands"
 )
@@ -11,9 +10,15 @@ import (
 func HandlerFeeds(s *commands.State, cmd commands.Command) error {
 	feeds, err := s.DB.GetAllFeeds(context.Background())
 	if err != nil {
-		log.Printf("ERROR: can't get feeds, %v\n", err)
-		return err
+		return fmt.Errorf("couldn't get feeds, %w\n", err)
 	}
+
+	if len(feeds) == 0 {
+		fmt.Println("No feeds found!")
+		return nil
+	}
+
+	fmt.Printf("Found %d feeds:\n", len(feeds))
 
 	for _, feed := range feeds {
 		fmt.Printf("%s\n", feed.Name)

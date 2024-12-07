@@ -14,7 +14,11 @@ func HandlerFollowing(s *commands.State, cmd commands.Command, user database.Use
 		return fmt.Errorf("can't get feeds for user %s, %v", user.Name, err)
 	}
 
-	fmt.Printf("User: %s\n", user.Name)
+	if len(feeds) == 0 {
+		fmt.Println("No feed follows found for user: %s", user.Name)
+	}
+
+	fmt.Printf("Feed follows for user: %s:\n", user.Name)
 
 	for _, feed := range feeds {
 		fmt.Printf("- %s\n", feed.Name)

@@ -11,16 +11,12 @@ import (
 )
 
 func HandlerFollow(s *commands.State, cmd commands.Command, user database.User) error {
-	if len(cmd.Args) < 1 {
-		fmt.Printf("USAGE: %s <URL>\n", cmd.Name)
-		return fmt.Errorf("URL missing\n")
+	if len(cmd.Args) != 1 {
+		return fmt.Errorf("USAGE: %s <URL>\n", cmd.Name)
 	}
 
 	url := cmd.Args[0]
 
-	var feed database.Feed
-
-	// check if a feed exists
 	feed, err := s.DB.GetFeedByURL(context.Background(), url)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -29,7 +25,6 @@ func HandlerFollow(s *commands.State, cmd commands.Command, user database.User) 
 		return err
 	}
 
-	// following the desired feed
 	followFeed, err := s.DB.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
 		UserID: user.ID,
 		FeedID: feed.ID,
@@ -37,6 +32,8 @@ func HandlerFollow(s *commands.State, cmd commands.Command, user database.User) 
 	if err != nil {
 		return fmt.Errorf("couldn't create feed: %w\n", err)
 	}
+
+	fmt.Println("Feed follow created!")
 
 	fmt.Printf("Feed Name: %s\n", followFeed.FeedName)
 	fmt.Printf("User Name: %s\n", followFeed.UserName)

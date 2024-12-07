@@ -11,40 +11,35 @@ import (
 )
 
 func HandlerAddFeed(s *commands.State, cmd commands.Command, user database.User) error {
-	if len(cmd.Args) < 2 {
-		fmt.Printf("USAGE: addfeed <name> <feed_link>\n")
-		return fmt.Errorf("%s command, wrong structure\n", cmd.Name)
+	if len(cmd.Args) != 2 {
+		return fmt.Errorf("USAGE: %s <name> <url>\n", cmd.Name)
 	}
 
 	name := cmd.Args[0]
 	url := cmd.Args[1]
 
-	data := database.CreateFeedParams{
+	feed, err := s.DB.CreateFeed(context.Background(), database.CreateFeedParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 		Name:      name,
 		Url:       url,
 		UserID:    user.ID,
-	}
-
-	feed, err := s.DB.CreateFeed(context.Background(), data)
-	if err != nil {
-		return fmt.Errorf("can't create feed: %v\n", err)
-	}
-
-	followFeed, err := s.DB.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
-		UserID: user.ID,
-		FeedID: feed.ID,
 	})
 	if err != nil {
-		return fmt.Errorf("can't follow feed: %w", err)
+		return fmt.Errorf("couldn't create feed: %w\n", err)
 	}
 
-	fmt.Printf("Adding feed %s is done!\n", name)
-	fmt.Printf("%s is now following %s feed.\n", user.Name, name)
+	fmt.Println("Feed created successfully!")
 
-	fmt.Println(followFeed)
+	if _, err = s.DB.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
+		UserID: user.ID,
+		FeedID: feed.ID,
+	}); err != nil {
+		return fmt.Errorf("couldn't follow feed: %w", err)
+	}
+
+	fmt.Printf("%s is now following %s feed.\n", user.Name, name)
 
 	return nil
 }

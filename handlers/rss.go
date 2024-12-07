@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Dhar01/Gator/commands"
+	"github.com/Dhar01/Gator/internal/database"
 )
 
 type RSSFeed struct {
@@ -98,24 +99,38 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 	return &feed, nil
 }
 
-func scrapeFeeds(s *commands.State) error {
-	nextFeed, err := s.DB.GetNextFeedToFetch(context.Background())
+func scrapeFeeds(s *commands.State) {
+	feed, err := s.DB.GetNextFeedToFetch(context.Background())
 	if err != nil {
-		return fmt.Errorf("couldn't get the next feed, %w", err)
+		log.Println("couldn't get next feeds to fetch")
+		return
 	}
 
-	if _, err = s.DB.MarkFeedFetched(context.Background(), nextFeed.ID); err != nil {
-		return fmt.Errorf("can't mark as fetched")
+	log.Println("found a feed to fetch!")
+	scrapeFeed(s.DB, feed)
+}
+
+func scrapeFeed(db *database.Queries, feed database.Feed) {
+	if _, err := db.MarkFeedFetched(context.Background(), feed.ID); err != nil {
+		log.Printf("couldn't mark feed %s fetched: %v", feed.Name, err)
+		return
 	}
 
-	feedData, err := fetchFeed(context.Background(), nextFeed.Url)
+	feedData, err := fetchFeed(context.Background(), feed.Url)
 	if err != nil {
-		return fmt.Errorf("couldn't fetch the feed")
+		log.Printf("couldn't collect feed %s: %v", feed.Name, err)
+		return
 	}
 
-	for _, item := range feedData.Channel.Item {
-		fmt.Printf("- %s\n", item.Title)
-	}
+	// for _, item := range feedData.Channel.Item {
+	// 	publishedAt := sql.NullTime{}
+	// 	if t, err := time.Parse()
+	// 	_, err = db.CreatePost(context.Background(), database.CreatePostParams{
+	// 		Url:         item.Link,
+	// 		Description: item.Description,
+	// 		Title:       item.Title,
+	// 		PublishedAt: item.PubDate,
+	// 	})
+	// }
 
-	return nil
 }
