@@ -8,7 +8,37 @@
 
 # Install
 
-This project uses Go and PostgresSQL. Check them out if you don't have them locally installed. (*to be updated*)
+This project uses Go and PostgresSQL. Please ensure to set them up before proceeding.
+
+1. Install Go
+   - Download and install Go from the [official Go website](https://go.dev/dl/).
+   - Verify installation:
+
+    ```bash
+    go version
+    ```
+
+2. Install PostgreSQL
+    - Install PostgreSQL from the [official PostgreSQL website](https://www.postgresql.org/download/).
+    - Verify Installation:
+
+    ```bash
+    psql --version
+    ````
+
+3. Install via `go install`
+
+    ```bash
+    go install github.com/Dhar01/Gator@latest
+    ````
+
+4. On Linux machine, create a configuration file on `$HOME` directory named `.gatorconfig.json`
+
+After installation, run the program using:
+
+```bash
+Gator ...
+```
 
 # Usage
 
