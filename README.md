@@ -32,13 +32,23 @@ This project uses Go and PostgresSQL. Please ensure to set them up before procee
     go install github.com/Dhar01/Gator@latest
     ````
 
-4. On Linux machine, create a configuration file on `$HOME` directory named `.gatorconfig.json`
+4. After installation, run the program using:
 
-After installation, run the program using:
+    ```bash
+    Gator ...
+    ```
 
-```bash
-Gator ...
+# Config
+
+Create a `.gatorconfig.json` file in home directory. Example:
+
+```json
+{
+    "db_url": "postgres://username:@localhost:5432/database?sslmode=disable"
+}
 ```
+Replace the values with your database connection string.
+
 
 # Usage
 
